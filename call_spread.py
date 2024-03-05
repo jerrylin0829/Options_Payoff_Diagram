@@ -1,52 +1,25 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from plain_vanilla_options import PlainVanillaOptions
 
-class PlainVanillaOptions:
-    def __init__(self, S, K, P, LorS, option_type):
-        self.S = S  # 現價
-        self.K = K  # 履約價
-        self.P = P  # 權利金
-        self.LorS = LorS  # 買or賣 ('Long' 或 'Short')
-        self.option_type = option_type  # 選擇權類型 ('call' 或 'put')
+class CallSpread():
+    def __init__(self, option1, option2):
+        
+        self.S1, self.K1, self.P1, self.LorS1, self.option_type1 = option1
+        self.S2, self.K2, self.P2, self.LorS2, self.option_type2 = option2
+        
+        self.plain_vanilla_options1 = PlainVanillaOptions(self.S1, self.K1, self.P1, self.LorS1, self.option_type1)
+        self.plain_vanilla_options2 = PlainVanillaOptions(self.S2, self.K2, self.P2, self.LorS2, self.option_type2)
 
     def calculate_price(self):
-        if self.option_type == 'call':
-            if self.LorS == 'long':
-                option_price = max(0, self.S - self.K) - self.P
-            elif self.LorS == 'short':
-                option_price = min(0, self.K - self.S) + self.P
-            else:
-                raise ValueError("Invalid option direction. Please specify 'long' or 'short'.")
-            
-        elif self.option_type == 'put':
-            if self.LorS == 'long':
-                option_price = max(0, self.K - self.S) - self.P
-            elif self.LorS == 'short':
-                option_price = min(0, self.S - self.K) + self.P
-            else:
-                raise ValueError("Invalid option direction. Please specify 'long' or 'short'.")
-        else:
-            raise ValueError("Invalid option type. Please specify 'call' or 'put'.")
-        
+        option_price = self.plain_vanilla_options1.calculate_price() + self.plain_vanilla_options2.calculate_price()
         return option_price
     
-    def calculate_payoff(self, underlying_price):
-        if self.option_type == 'call':
-            if self.LorS == 'long':
-                payoff = max(0, underlying_price - self.K) - self.P
-            elif self.LorS == 'short':
-                payoff = min(0, self.K - underlying_price) + self.P
-            
-        elif self.option_type == 'put':
-            if self.LorS == 'long':
-                payoff = max(0, self.K - underlying_price) - self.P
-            elif self.LorS == 'short':
-                payoff = min(0, underlying_price - self.K) + self.P
-
-        return payoff
+    def plot_call_spread(self):
+        underlying_range = np.linspace(0.6 * min(self.K1, self.K2), 1.3 * max(self.K1, self.K2), 50)
 
     def plot_payoff(self, LorS, option_type):
-        underlying_range = np.linspace(0.6 * self.S, 1.3 * self.K, 100)
+        underlying_range = np.linspace(0.8 * self.K, 1.2 * self.K, 100)
         payoffs = [self.calculate_payoff(underlying_price) for underlying_price in underlying_range]
         plt.plot(underlying_range, payoffs, label='Payoff')
         plt.axhline(y=0, color='black')
@@ -94,22 +67,4 @@ class PlainVanillaOptions:
         
         plt.legend()
         plt.show()
-
-if __name__ == '__main__':
-
-    # Example usage:
-    S = 5500   # 現價
-    K = 5300    # 履約價
-    P = 90      # 權利金
-
-    # For American options
-    lot = 1     # 口數
-    share = 100 # 一口股數
-    LorS = input("long or short: ")  # 買or賣 ('Long' 或 'Short')
-    option_type = input("call or put: ")  # 選擇權類型 ('call' 或 'put')
-
-    option = PlainVanillaOptions(S, K, P, LorS, option_type)
-    option_price = option.calculate_price()
-    print("Taiwan Option Price:", option_price*50)
-    print("American Option Price:", option_price*lot*share)
-    option.plot_payoff(LorS, option_type)
+    

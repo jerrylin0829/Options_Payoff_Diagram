@@ -1,25 +1,20 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from plain_vanilla_options import PlainVanillaOptions
+from call_spread import CallSpread
+from debit_spread import DebitSpread
 
 class TwoOptions():
     def __init__(self, option1, option2):
-        
-        self.S1, self.K1, self.P1, self.LorS1, self.option_type1 = option1
-        self.S2, self.K2, self.P2, self.LorS2, self.option_type2 = option2
-
-        self.plain_vanilla_options1 = PlainVanillaOptions(self.S1, self.K1, self.P1, self.LorS1, self.option_type1)
-        self.plain_vanilla_options2 = PlainVanillaOptions(self.S2, self.K2, self.P2, self.LorS2, self.option_type2)
-
-    # long call and short call
-    def call_spread(self):
-        option_price = self.plain_vanilla_options1.calculate_price() + self.plain_vanilla_options2.calculate_price()
-        return option_price
-
+        self.call_spread = CallSpread(option1, option2)
+        self.debit_spread = DebitSpread(option1, option2)
 if __name__ == '__main__':
     
-    option1 = (7000, 5100, 200, 'long', 'call')
-    option2 = (7000, 5300, 90,'short', 'call')
+    option1 = (4000, 4200, 90, 'short', 'call')
+    option2 = (4000, 3800, 120,'long', 'call')
     two_options = TwoOptions(option1, option2)
-
-    print(two_options.call_spread()*50)
+    plot_call_spread = two_options.call_spread.plot()
+    # plot_debit_spread = two_options.debit_spread.plot()
+    # price_debit_spread = two_options.debit_spread.calculate_price()
+    # print(price_put_spread)
+    # print(plot_call_spread)

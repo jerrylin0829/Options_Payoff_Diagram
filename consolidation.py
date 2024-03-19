@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from plain_vanilla_options import PlainVanillaOptions
 
-class CallSpread():
+class Consolidation():
     def __init__(self, option1, option2):
         
         self.S1, self.K1, self.P1, self.LorS1, self.option_type1 = option1
@@ -21,7 +21,7 @@ class CallSpread():
         payoffs1 = [self.plain_vanilla_options1.calculate_payoff(underlying_price) for underlying_price in underlying_range]
         payoffs2 = [self.plain_vanilla_options2.calculate_payoff(underlying_price) for underlying_price in underlying_range]
         payoffs = [payoff1 + payoff2 for payoff1, payoff2 in zip(payoffs1, payoffs2)]
-        
+
         # Convert payoffs to numpy array
         payoffs = np.array(payoffs)
 
@@ -32,7 +32,7 @@ class CallSpread():
         plt.plot(self.K2, 0, 'go', label=f'K2: {self.K2:.2f}', alpha=0.3)
         plt.xlabel('Underlying Price')
         plt.ylabel('Payoff')
-        plt.title('Call Spread')
+        plt.title('Consolidation')
         plt.grid(True)
 
         # Calculate and plot breakeven points
@@ -55,4 +55,12 @@ class CallSpread():
         plt.fill_between(underlying_range, payoffs, where=(payoffs > 0), color='green', alpha=0.2, label='Loss Area')
         plt.legend()
         plt.show()     
-    
+
+if __name__ == '__main__':
+    option1 = (4000, 4200, 90, 'short', 'call')
+    option2 = (4000, 3800, 120,'short', 'put')
+    consolidation = Consolidation(option1, option2)
+    price = consolidation.calculate_price()
+    print(price)
+    plot = consolidation.plot()
+    # print(plot)

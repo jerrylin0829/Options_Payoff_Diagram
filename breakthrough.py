@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from plain_vanilla_options import PlainVanillaOptions
 
-class CallSpread():
+class Breakthrough():
     def __init__(self, option1, option2):
         
         self.S1, self.K1, self.P1, self.LorS1, self.option_type1 = option1
@@ -21,10 +21,9 @@ class CallSpread():
         payoffs1 = [self.plain_vanilla_options1.calculate_payoff(underlying_price) for underlying_price in underlying_range]
         payoffs2 = [self.plain_vanilla_options2.calculate_payoff(underlying_price) for underlying_price in underlying_range]
         payoffs = [payoff1 + payoff2 for payoff1, payoff2 in zip(payoffs1, payoffs2)]
-        
+
         # Convert payoffs to numpy array
         payoffs = np.array(payoffs)
-
         plt.plot(underlying_range, payoffs, label='Payoff', color = "r")
         plt.axhline(y=0, color='black')
         plt.axvline(x=self.S1, color='gray', linestyle='--', label='Market Price')
@@ -32,7 +31,7 @@ class CallSpread():
         plt.plot(self.K2, 0, 'go', label=f'K2: {self.K2:.2f}', alpha=0.3)
         plt.xlabel('Underlying Price')
         plt.ylabel('Payoff')
-        plt.title('Call Spread')
+        plt.title('Breakthrough')
         plt.grid(True)
 
         # Calculate and plot breakeven points
@@ -44,7 +43,7 @@ class CallSpread():
                 # Use linear interpolation to calculate the underlying_price at the crossing
                 breakeven_point = x1 - y1 * (x2 - x1) / (y2 - y1)
                 breakeven_points.append(breakeven_point)
-                
+
         for breakeven_point in breakeven_points:
             plt.plot([breakeven_point], [0], 'bo', label=f'BEP: {breakeven_point:.2f}', alpha=0.3)
         
@@ -52,7 +51,14 @@ class CallSpread():
         plt.fill_between(underlying_range, payoffs, where=(payoffs <= 0), color='red', alpha=0.2, label='Profit Area')
         
         # Profit Area
-        plt.fill_between(underlying_range, payoffs, where=(payoffs > 0), color='green', alpha=0.2, label='Loss Area')
+        plt.fill_between(underlying_range, payoffs, where=(payoffs >= 0), color='green', alpha=0.2, label='Loss Area')
         plt.legend()
         plt.show()     
-    
+
+if __name__ == '__main__':
+    option1 = (4000, 3600, 150, 'long', 'put')
+    option2 = (4000, 3800, 120,'long', 'call')
+    consolidation = Breakthrough(option1, option2)
+    price = consolidation.calculate_price()
+    print(price)
+    plot = consolidation.plot()
